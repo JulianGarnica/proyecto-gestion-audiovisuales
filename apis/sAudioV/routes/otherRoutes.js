@@ -7,10 +7,16 @@ const {
   implementoRegisterValidator,
   docenteRegisterValidator,
   prestamoRegisterValidator,
-  prestamoUpdateValidator
+  prestamoUpdateValidator,
+  facultadRegisterValidator,
+  facultadChangerValidator,
+  salonRegisterValidator,
+  salonChangerValidator
 } = require("../validators/othersValidators");
 const router = require("../routes/userRoutes");
-const authenticateToken = require('../middleware/authMiddleware')
+const authenticateToken = require('../middleware/authMiddleware');
+const FacultadController = require("../controllers/facultadController");
+const SalonController = require("../controllers/salonController");
 
 //Lo dejo así porque me da pereza dividirlo todo en diferentes archivos de ruta XD
 //Porfa, no lo hagan así, siempre traten de tenerlo ordenado
@@ -32,4 +38,15 @@ router.route('/prestamo')
   .put(prestamoUpdateValidator, authenticateToken, PrestamoController.update)
   .delete(authenticateToken, PrestamoController.delete);
 
+router.route('/facultad')
+  .get(authenticateToken, FacultadController.info)
+  .post(facultadRegisterValidator, authenticateToken, FacultadController.register)
+  .put(facultadChangerValidator, authenticateToken, FacultadController.update)
+  .delete(authenticateToken, FacultadController.delete);
+
+router.route('/salon')
+  .get(authenticateToken, SalonController.info)
+  .post(salonRegisterValidator, authenticateToken, SalonController.register)
+  .put(salonChangerValidator, authenticateToken, SalonController.update)
+  .delete(authenticateToken, SalonController.delete);
 module.exports = router;

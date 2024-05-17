@@ -8,7 +8,7 @@ const Op = db.Sequelize.Op;
 
 
 const SECRET_KEY = config.secret_key;
-const Prestamo = db.Prestamo;
+const Facultad = db.Facultad;
 
 const getPagination = (page, size) => {
   const limit = size ? +size : 3;
@@ -25,7 +25,7 @@ const getPagingData = (data, page, limit) => {
 };
 
 
-class PrestamoController {
+class FacultadController {
   static async test(req, res) {
     res.status(200).json({ message: "pong!" });
   }
@@ -37,27 +37,26 @@ class PrestamoController {
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { fechaHoraEntrega, fechaHoraRecibido, estado, observacion, cedulaEncargado, codigoRel, cedulaDocente, idClase } = req.body;
+    const { nombreFacultad } = req.body;
 
     try {
-      Prestamo.sync().then(async function () {
-        try {
-            const data = await Prestamo.create({
-              fechaHoraEntrega: fechaHoraEntrega,
-              fechaHoraRecibido: fechaHoraRecibido,
-              estado: estado,
-              observacion: observacion,
-              cedulaEncargado: cedulaEncargado,
-              codigo: codigoRel,
-              cedulaDocente: cedulaDocente,
-              idClase: idClase
-            });
-            // Respond with success
-            res.status(201).json({ message: "Préstamo registrado con éxito" });
-        } catch (err) {
-          console.error(err);
-          res.status(400).json({ error: "Llaves foráneas no encontradas" });
-        }  
+      Facultad.sync().then(function () {
+        Facultad.findOne({ where: { nombreFacultad: nombreFacultad } })
+          .then(async function (data) {
+            if (data) {
+              return res.status(400).json({ error: "El nombre del Facultad ya existe" });
+            } else {
+              Facultad.create({
+                nombreFacultad: nombreFacultad
+              });
+              // Respond with success
+              res.status(201).json({ message: "Facultad registrado con éxito" });
+            }
+          })
+          .catch(async (error) => {
+            console.log(error);
+            res.status(500).json({ message: "Server error" });
+          });
       });
     } catch (err) {
       console.error(err);
@@ -72,32 +71,24 @@ class PrestamoController {
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { codigo, fechaHoraEntrega, fechaHoraRecibido, estado, observacion, cedulaEncargado, codigoRel, cedulaDocente, idClase } = req.body;
+    const { idFacultad, nombreFacultad } = req.body;
 
     try {
-      Prestamo.sync().then(function () {
-        Prestamo.findOne({ where: { idPrestamo: codigo } })
+      Facultad.sync().then(function () {
+        Facultad.findOne({ where: { idFacultad: idFacultad } })
           .then(async function (data) {
             if (data) {
-              Prestamo.update({
-                fechaHoraEntrega: fechaHoraEntrega,
-                fechaHoraRecibido: fechaHoraRecibido,
-                salon: salon,
-                estado: estado,
-                observacion: observacion,
-                cedulaEncargado: cedulaEncargado,
-                codigo: codigoRel,
-                cedulaDocente: cedulaDocente,
-                idClase: idClase
+              Facultad.update({
+                nombreFacultad: nombreFacultad
               },
               {
                 where: {
-                  idPrestamo: codigo,
+                  idFacultad: idFacultad,
                 },
               });
-              res.status(201).json({ message: "Préstamo actualizado con éxito" });
+              res.status(201).json({ message: "Facultad actualizado con éxito" });
             } else {
-              return res.status(400).json({ error: "El código del préstamo no existe" });
+              return res.status(400).json({ error: "El código del Facultad no existe" });
             }
           })
           .catch(async (error) => {
@@ -123,31 +114,25 @@ class PrestamoController {
     try {
       q
       ? 
-        Prestamo.sync().then(function () {
-          Prestamo.findOne({ where: { idPrestamo: q } }).then(async function (data) {
+        Facultad.sync().then(function () {
+          Facultad.findOne({ where: { idFacultad: q } }).then(async function (data) {
             if(data){
-              res.status(200).json({ Prestamo: data });
+              res.status(200).json({ Facultad: data });
             }else{
-              return res.status(403).json({ error: "Préstamo no encontrado" });
+              return res.status(403).json({ error: "Facultad no encontrado" });
             }
           });
         })
-      : Prestamo.sync().then(function () {
+      : Facultad.sync().then(function () {
         const condition = search
           ? {
               [Op.or]: [
-                { fechaHoraEntrega: { [Op.like]: `%${search}%` } },
-                { fechaHoraEntrega: { [Op.like]: `%${search}%` } },
-                { salon: { [Op.like]: `%${search}%` } },
-                { estado: { [Op.like]: `%${search}%` } },
-                { observacion: { [Op.like]: `%${search}%` } },
-                { cedulaEncargado: { [Op.like]: `%${search}%` } },
-                { codigo: { [Op.like]: `%${search}%` } },
-                { cedulaDocente: { [Op.like]: `%${search}%` } }
+                { idFacultad: { [Op.like]: `%${search}%` } },
+                { nombreFacultad: { [Op.like]: `%${search}%` } }
               ],
             }
           : null;
-        Prestamo.findAndCountAll({
+        Facultad.findAndCountAll({
           where: condition,
           limit,
           offset,
@@ -179,13 +164,13 @@ class PrestamoController {
     try {
       q
       ? 
-        Prestamo.sync().then(function () {
-          Prestamo.destroy({
+        Facultad.sync().then(function () {
+          Facultad.destroy({
             where: {
-              idPrestamo: q
+              idFacultad: q
             },
           })
-          res.status(200).json({ message: "Préstamo eliminado con éxito" })
+          res.status(200).json({ message: "Facultad eliminado con éxito" })
         })
       : res.status(403).json({ error: "Consulta no válida" });
       
@@ -197,4 +182,4 @@ class PrestamoController {
 
 
 }
-module.exports = PrestamoController;
+module.exports = FacultadController;

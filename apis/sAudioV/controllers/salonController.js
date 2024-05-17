@@ -1,14 +1,16 @@
-//Const of module required
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { validationResult } = require("express-validator");
 const db = require("../models/index");
 const config = require("../../../config.json")["development"];
+
+//Const of module required
 const Op = db.Sequelize.Op;
 
+//Change it to salon model
 
 const SECRET_KEY = config.secret_key;
-const Prestamo = db.Prestamo;
+const Salon = db.Salon;
 
 const getPagination = (page, size) => {
   const limit = size ? +size : 3;
@@ -25,7 +27,7 @@ const getPagingData = (data, page, limit) => {
 };
 
 
-class PrestamoController {
+class SalonController {
   static async test(req, res) {
     res.status(200).json({ message: "pong!" });
   }
@@ -37,27 +39,19 @@ class PrestamoController {
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { fechaHoraEntrega, fechaHoraRecibido, estado, observacion, cedulaEncargado, codigoRel, cedulaDocente, idClase } = req.body;
+    const { tipoSalon, ubicacion } = req.body;
 
     try {
-      Prestamo.sync().then(async function () {
-        try {
-            const data = await Prestamo.create({
-              fechaHoraEntrega: fechaHoraEntrega,
-              fechaHoraRecibido: fechaHoraRecibido,
-              estado: estado,
-              observacion: observacion,
-              cedulaEncargado: cedulaEncargado,
-              codigo: codigoRel,
-              cedulaDocente: cedulaDocente,
-              idClase: idClase
-            });
-            // Respond with success
-            res.status(201).json({ message: "Préstamo registrado con éxito" });
-        } catch (err) {
-          console.error(err);
-          res.status(400).json({ error: "Llaves foráneas no encontradas" });
-        }  
+      Salon.sync().then(function () {
+
+        Salon.create({
+          tipoSalon: tipoSalon,
+          ubicacion: ubicacion
+        });
+        // Respond with success
+        res.status(201).json({ message: "Salón registrado con éxito" });
+            
+        
       });
     } catch (err) {
       console.error(err);
@@ -72,32 +66,25 @@ class PrestamoController {
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { codigo, fechaHoraEntrega, fechaHoraRecibido, estado, observacion, cedulaEncargado, codigoRel, cedulaDocente, idClase } = req.body;
+    const { idSalon, tipoSalon, ubicacion } = req.body;
 
     try {
-      Prestamo.sync().then(function () {
-        Prestamo.findOne({ where: { idPrestamo: codigo } })
+      Salon.sync().then(function () {
+        Salon.findOne({ where: { idSalon: idSalon } })
           .then(async function (data) {
             if (data) {
-              Prestamo.update({
-                fechaHoraEntrega: fechaHoraEntrega,
-                fechaHoraRecibido: fechaHoraRecibido,
-                salon: salon,
-                estado: estado,
-                observacion: observacion,
-                cedulaEncargado: cedulaEncargado,
-                codigo: codigoRel,
-                cedulaDocente: cedulaDocente,
-                idClase: idClase
+              Salon.update({
+                tipoSalon: tipoSalon,
+                ubicacion: ubicacion
               },
               {
                 where: {
-                  idPrestamo: codigo,
+                  idSalon: idSalon,
                 },
               });
-              res.status(201).json({ message: "Préstamo actualizado con éxito" });
+              res.status(201).json({ message: "Salón actualizado con éxito" });
             } else {
-              return res.status(400).json({ error: "El código del préstamo no existe" });
+              return res.status(400).json({ error: "El código del salón no existe" });
             }
           })
           .catch(async (error) => {
@@ -123,31 +110,26 @@ class PrestamoController {
     try {
       q
       ? 
-        Prestamo.sync().then(function () {
-          Prestamo.findOne({ where: { idPrestamo: q } }).then(async function (data) {
+        Salon.sync().then(function () {
+          Salon.findOne({ where: { idSalon: q } }).then(async function (data) {
             if(data){
-              res.status(200).json({ Prestamo: data });
+              res.status(200).json({ Salon: data });
             }else{
-              return res.status(403).json({ error: "Préstamo no encontrado" });
+              return res.status(403).json({ error: "Salón no encontrado" });
             }
           });
         })
-      : Prestamo.sync().then(function () {
+      : Salon.sync().then(function () {
         const condition = search
           ? {
               [Op.or]: [
-                { fechaHoraEntrega: { [Op.like]: `%${search}%` } },
-                { fechaHoraEntrega: { [Op.like]: `%${search}%` } },
-                { salon: { [Op.like]: `%${search}%` } },
-                { estado: { [Op.like]: `%${search}%` } },
-                { observacion: { [Op.like]: `%${search}%` } },
-                { cedulaEncargado: { [Op.like]: `%${search}%` } },
-                { codigo: { [Op.like]: `%${search}%` } },
-                { cedulaDocente: { [Op.like]: `%${search}%` } }
+                { idSalon: { [Op.like]: `%${search}%` } },
+                { tipoSalon: { [Op.like]: `%${search}%` } },
+                { ubicacion: { [Op.like]: `%${search}%` } }
               ],
             }
           : null;
-        Prestamo.findAndCountAll({
+        Salon.findAndCountAll({
           where: condition,
           limit,
           offset,
@@ -179,13 +161,13 @@ class PrestamoController {
     try {
       q
       ? 
-        Prestamo.sync().then(function () {
-          Prestamo.destroy({
+        Salon.sync().then(function () {
+          Salon.destroy({
             where: {
-              idPrestamo: q
+              idSalon: q
             },
           })
-          res.status(200).json({ message: "Préstamo eliminado con éxito" })
+          res.status(200).json({ message: "Salón eliminado con éxito" })
         })
       : res.status(403).json({ error: "Consulta no válida" });
       
@@ -197,4 +179,4 @@ class PrestamoController {
 
 
 }
-module.exports = PrestamoController;
+module.exports = SalonController;

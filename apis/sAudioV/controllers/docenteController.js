@@ -34,7 +34,7 @@ class DocenteController {
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { cedulaDocente, nombre, facultad, clase } = req.body;
+    const { cedulaDocente, nombre, idSalon, idFacultad } = req.body;
 
     try {
       Docente.sync().then(function () {
@@ -43,14 +43,19 @@ class DocenteController {
             if (data) {
               return res.status(400).json({ error: "El código del Docente ya existe" });
             } else {
-              Docente.create({
-                cedulaDocente: cedulaDocente,
-                nombre: nombre,
-                facultad: facultad,
-                clase: clase
-              });
-              // Respond with success
-              res.status(201).json({ message: "Docente registrado con éxito" });
+              try {
+                Docente.create({
+                  cedulaDocente: cedulaDocente,
+                  nombre: nombre,
+                  idSalon: idSalon,
+                  idFacultad: idFacultad
+                });
+                // Respond with success
+                res.status(201).json({ message: "Docente registrado con éxito" });
+              } catch (error) {
+                res.status(500).json({ message: "Server error: "+error });
+              }
+              
             }
           })
           .catch(async (error) => {
@@ -71,24 +76,29 @@ class DocenteController {
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { cedulaDocente, nombre, facultad, clase } = req.body;
+    const { cedulaDocente, nombre, idSalon, idFacultad } = req.body;
 
     try {
       Docente.sync().then(function () {
         Docente.findOne({ where: { cedulaDocente: cedulaDocente } })
           .then(async function (data) {
             if (data) {
-              Docente.update({
-                nombre: nombre,
-                facultad: facultad,
-                clase: clase
-              },
-              {
-                where: {
-                  cedulaDocente: cedulaDocente,
+              try {
+                Docente.update({
+                  nombre: nombre,
+                  idSalon: idSalon,
+                  idFacultad: idFacultad
                 },
-              });
-              res.status(201).json({ message: "Docente actualizado con éxito" });
+                {
+                  where: {
+                    cedulaDocente: cedulaDocente,
+                  },
+                });
+                res.status(201).json({ message: "Docente actualizado con éxito" });
+              } catch (error) {
+                res.status(500).json({ message: "Server error: "+error });
+              }
+              
             } else {
               return res.status(400).json({ error: "El código del Docente no existe" });
             }
@@ -130,8 +140,8 @@ class DocenteController {
             ? {
                 [Op.or]: [
                   { nombre: { [Op.like]: `%${search}%` } },
-                  { facultad: { [Op.like]: `%${search}%` } },
-                  { clase: { [Op.like]: `%${search}%` } }
+                  { idFacultad: { [Op.like]: `%${search}%` } },
+                  { idSalon: { [Op.like]: `%${search}%` } }
                 ],
               }
             : null;

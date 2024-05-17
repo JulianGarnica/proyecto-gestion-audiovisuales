@@ -22,6 +22,10 @@ module.exports = (sequelize, DataTypes) => {
         as: "cedulaDocenteFK",
         foreignKey: "cedulaDocente",
       });
+      Prestamo.belongsTo(models.Clase, {
+        as: "claseFK",
+        foreignKey: "idClase",
+      });
     }
   }
   Prestamo.init({
@@ -31,13 +35,13 @@ module.exports = (sequelize, DataTypes) => {
       primaryKey: true,
       type: DataTypes.INTEGER
     },
-    fecha: {
+    fechaHoraEntrega: {
       allowNull: false,
       type: DataTypes.DATE
     },
-    salon: {
+    fechaHoraRecibido: {
       allowNull: false,
-      type: DataTypes.STRING,
+      type: DataTypes.DATE
     },
     estado: {
       allowNull: false,

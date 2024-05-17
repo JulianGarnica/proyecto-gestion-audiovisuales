@@ -11,6 +11,8 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use(cors())
+app.options('*', cors()) 
+
 app.use("/api", require("./routesAPI"));
 
 
