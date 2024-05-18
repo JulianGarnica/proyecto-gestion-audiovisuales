@@ -127,7 +127,19 @@ class DocenteController {
       q
       ? 
         Docente.sync().then(function () {
-          Docente.findOne({ where: { cedulaDocente: q } }).then(async function (data) {
+          Docente.findOne({ where: { cedulaDocente: q },
+            include: [
+              {
+                model: db.Facultad,
+                as: "facultadFK",
+                attributes: ["nombreFacultad"],
+              },
+              {
+                model: db.Salon,
+                as: "salonFK",
+                attributes: ["tipoSalon", "ubicacion"],
+              },
+            ] }).then(async function (data) {
             if(data){
               res.status(200).json({ Docente: data });
             }else{
@@ -149,6 +161,18 @@ class DocenteController {
             where: condition,
             limit,
             offset,
+            include: [
+              {
+                model: db.Facultad,
+                as: "facultadFK",
+                attributes: ["nombreFacultad"],
+              },
+              {
+                model: db.Salon,
+                as: "salonFK",
+                attributes: ["tipoSalon", "ubicacion"],
+              },
+            ],
           }).then((data) => {
             res.send(getPagingData(data, page, limit) );
           })

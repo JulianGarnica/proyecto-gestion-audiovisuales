@@ -42,6 +42,30 @@ class PrestamoController {
     try {
       Prestamo.sync().then(async function () {
         try {
+
+            
+
+            const encargado = await db.Encargados.findOne({ where: { cedulaEncargado: cedulaEncargado } });
+            const implemento = await db.Implemento.findOne({ where: { codigo: codigoRel } });
+            const docente = await db.Docente.findOne({ where: { cedulaDocente: cedulaDocente } });
+            const clase = await db.Clase.findOne({ where: { idClase: idClase } });
+
+            if (!encargado) {
+              return res.status(400).json({ error: "Cédula de encargado no encontrada" });
+            }
+
+            if (!implemento) {
+              return res.status(400).json({ error: "Código de implemento no encontrado" });
+            }
+
+            if (!docente) {
+              return res.status(400).json({ error: "Cédula de docente no encontrada" });
+            }
+
+            if (!clase) {
+              return res.status(400).json({ error: "ID de clase no encontrado" });
+            }
+
             const data = await Prestamo.create({
               fechaHoraEntrega: fechaHoraEntrega,
               fechaHoraRecibido: fechaHoraRecibido,
@@ -52,11 +76,12 @@ class PrestamoController {
               cedulaDocente: cedulaDocente,
               idClase: idClase
             });
+
             // Respond with success
             res.status(201).json({ message: "Préstamo registrado con éxito" });
         } catch (err) {
           console.error(err);
-          res.status(400).json({ error: "Llaves foráneas no encontradas" });
+          res.status(400).json({ error: "Llaves foráneas no encontradas " + err });
         }  
       });
     } catch (err) {
@@ -78,6 +103,28 @@ class PrestamoController {
       Prestamo.sync().then(function () {
         Prestamo.findOne({ where: { idPrestamo: codigo } })
           .then(async function (data) {
+
+            const encargado = await db.Encargados.findOne({ where: { cedulaEncargado: cedulaEncargado } });
+            const implemento = await db.Implemento.findOne({ where: { codigo: codigoRel } });
+            const docente = await db.Docente.findOne({ where: { cedulaDocente: cedulaDocente } });
+            const clase = await db.Clase.findOne({ where: { idClase: idClase } });
+
+            if (!encargado) {
+              return res.status(400).json({ error: "Cédula de encargado no encontrada" });
+            }
+
+            if (!implemento) {
+              return res.status(400).json({ error: "Código de implemento no encontrado" });
+            }
+
+            if (!docente) {
+              return res.status(400).json({ error: "Cédula de docente no encontrada" });
+            }
+
+            if (!clase) {
+              return res.status(400).json({ error: "ID de clase no encontrado" });
+            }
+
             if (data) {
               Prestamo.update({
                 fechaHoraEntrega: fechaHoraEntrega,
@@ -151,6 +198,40 @@ class PrestamoController {
           where: condition,
           limit,
           offset,
+          include: [
+            {
+              model: db.Docente,
+              as: "cedulaDocenteFK",
+              attributes: ["nombre"],
+              include: [
+                {
+                  model: db.Facultad,
+                  as: "facultadFK",
+                  attributes: ["nombreFacultad"],
+                },
+                {
+                  model: db.Salon,
+                  as: "salonFK",
+                  attributes: ["tipoSalon", "ubicacion"],
+                },
+              ],
+            },
+            {
+              model: db.Encargados,
+              as: "cedulaEncargadoFK",
+              attributes: ["nombres"],
+            },
+            {
+              model: db.Implemento,
+              as: "codigoFK",
+              attributes: ["implemento", "caracteristicas", "estadoPrestamo"],
+            },
+            {
+              model: db.Clase,
+              as: "claseFK",
+              attributes: ["nombreClase", "dia", "horaInicio", "horaFin"],
+            },
+          ],
         }).then((data) => {
           res.send( getPagingData(data, page, limit) );
         })

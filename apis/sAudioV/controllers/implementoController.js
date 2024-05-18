@@ -37,7 +37,7 @@ class ImplementoController {
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { codigo, implemento, caracteristicas } = req.body;
+    const { codigo, implemento, caracteristicas, estadoPrestamo } = req.body;
 
     try {
       Implemento.sync().then(function () {
@@ -49,7 +49,8 @@ class ImplementoController {
               Implemento.create({
                 codigo: codigo,
                 implemento: implemento,
-                caracteristicas: caracteristicas
+                caracteristicas: caracteristicas,
+                estadoPrestamo: estadoPrestamo
               });
               // Respond with success
               res.status(201).json({ message: "Implemento registrado con éxito" });
@@ -73,7 +74,7 @@ class ImplementoController {
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { codigo, implemento, caracteristicas } = req.body;
+    const { codigo, implemento, caracteristicas, estadoPrestamo } = req.body;
 
     try {
       Implemento.sync().then(function () {
@@ -82,7 +83,8 @@ class ImplementoController {
             if (data) {
               Implemento.update({
                 implemento: implemento,
-                caracteristicas: caracteristicas
+                caracteristicas: caracteristicas,
+                estadoPrestamo: estadoPrestamo
               },
               {
                 where: {
@@ -132,7 +134,8 @@ class ImplementoController {
               [Op.or]: [
                 { codigo: { [Op.like]: `%${search}%` } },
                 { implemento: { [Op.like]: `%${search}%` } },
-                { caracteristicas: { [Op.like]: `%${search}%` } }
+                { caracteristicas: { [Op.like]: `%${search}%` } },
+                { estadoPrestamo: { [Op.like]: `%${search}%`} }
               ],
             }
           : null;

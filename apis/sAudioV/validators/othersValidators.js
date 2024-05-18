@@ -5,6 +5,7 @@ exports.implementoRegisterValidator = [
   body("codigo").isString().withMessage("Código es requerido"),
   body("implemento").isString().withMessage("Implemento es requerido"),
   body("caracteristicas").isString().withMessage("Caracteristicas es requerido"),
+  body("estadoPrestamo").isString().withMessage("Estado de prestamo es requerido"),
 ];
 
 exports.docenteRegisterValidator = [
@@ -55,4 +56,21 @@ exports.salonChangerValidator = [
   body("idSalon").isNumeric().withMessage("idSalon es requerido"),
   body("tipoSalon").isString().withMessage("tipoSalon es requerido"),
   body("ubicacion").isString().withMessage("ubicacion es requerido"),
+];
+
+exports.claseRegisterValidator = [
+  body("nombreClase").isString().withMessage("nombreClase es requerido"),
+  body("dia").isString().withMessage("dia es requerido"),
+  body("horaInicio").isString().withMessage("horaInicio es requerido"),
+  body("horaFinal").isString().withMessage("horaFinal es requerido"),
+  body("idSalon").isNumeric().withMessage("idSalon es requerido"),
+  body("idFacultad").isNumeric().withMessage("idFacultad es requerido"),
+];
+exports.claseChangerValidator = [
+  body("idClase").isNumeric().withMessage("idClase es requerido"),
+  body("dia").isString().withMessage("dia es requerido"),
+  body("horaInicio").isString().withMessage("horaInicio es requerido"),
+  body("horaFinal").isString().withMessage("horaFinal es requerido"),
+  body("idSalon").isNumeric().withMessage("idSalon es requerido"),
+  body("idFacultad").isNumeric().withMessage("idFacultad es requerido"),
 ];

@@ -27,6 +27,10 @@ module.exports = (sequelize, DataTypes) => {
     caracteristicas: {
       allowNull: false,
       type: DataTypes.STRING,
+    },
+    estadoPrestamo: {
+      allowNull: false,
+      type: DataTypes.STRING,
     }
   }, {
     sequelize,
